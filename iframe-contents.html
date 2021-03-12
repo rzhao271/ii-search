@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Inner frame</title>
+  <script>
+    function searchFrame() {
+      const iframe = document.getElementById('inner-iframe');
+      const iframeName = iframe.name;
+      const searchText = document.getElementById('inner-search').value;
+      window.api.searchFrameInternal(searchText, iframeName, true);
+    }
+    function searchFrameNext() {
+      const iframe = document.getElementById('inner-iframe');
+      const iframeName = iframe.name;
+      const searchText = document.getElementById('inner-search').value;
+      window.api.searchFrameInternal(searchText, iframeName, false);
+    }
+    function searchFrameStop() {
+      const iframe = document.getElementById('inner-iframe');
+      const iframeName = iframe.name;
+      window.api.searchFrameInternalStop(iframeName);
+    }
+    document.addEventListener('keydown', onKeyDown);
+    function onKeyDown(e) {
+      if (e.code === 'F2') {
+        searchFrame();
+      } else if (e.code === 'F3') {
+        searchFrameNext();
+      } else if (e.code === 'F4') {
+        searchFrameStop();
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <input type="text" id="inner-search"></input>
+  <button onclick="searchFrame()">Start Search</button>
+  <button onclick="searchFrameNext()">Search Next</button>
+  <button onclick="searchFrameStop()">Stop Search</button>
+  <p>outer iframe contents here</p>
+  <iframe name="my-inner-search-iframe" id="inner-iframe" src="inner-iframe-contents.html" 
+    style="border: 2px solid forestgreen; background-color: white; width: 100%;">
+  </iframe>
+</body>
+
+</html>
