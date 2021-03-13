@@ -23,10 +23,11 @@ async function createWindow() {
   mainWindow.webContents.on('ipc-message', (event, channel, ...args) => {
     const webContents = mainWindow.webContents;
     const mainFrame = mainWindow.webContents.mainFrame;
-    const enableFrameSearch = false;
+
+    const enableFrameSearch = true;
     if (channel === 'search') {
       const [searchText, frameName, firstSearch] = args;
-      const frame = mainFrame.frames.find(frame => frame.name === frameName);
+      const frame = mainFrame.framesInSubtree.find(frame => frame.name === frameName);
       if (enableFrameSearch) {
         const opts = { frame: frame, findNext: firstSearch };
         webContents.findInPage(searchText, opts);
