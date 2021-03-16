@@ -6,36 +6,22 @@
   <meta charset="UTF-8">
   <title>Hello World!</title>
   <script>
-    function searchFrame() {
-      const iframe = document.getElementById('outer-iframe');
+    function searchFrame(id, inputId) {
+      const iframe = document.getElementById(id);
       const iframeName = iframe.name;
-      const searchText = document.getElementById('search').value;
+      const searchText = document.getElementById(inputId).value;
       window.api.searchFrameInternal(searchText, iframeName, true);
     }
-    function searchFrameNext() {
-      const iframe = document.getElementById('outer-iframe');
+    function searchFrameNext(id, inputId) {
+      const iframe = document.getElementById(id);
       const iframeName = iframe.name;
-      const searchText = document.getElementById('search').value;
+      const searchText = document.getElementById(inputId).value;
       window.api.searchFrameInternal(searchText, iframeName, false);
     }
-    function searchFrameStop() {
-      const iframe = document.getElementById('outer-iframe');
+    function searchFrameStop(id) {
+      const iframe = document.getElementById(id);
       const iframeName = iframe.name;
       window.api.searchFrameInternalStop(iframeName);
-    }
-    window.onload = function() {
-      const iframe = document.getElementById('outer-iframe');
-      iframe.contentWindow.api = window.api;
-    }
-    document.addEventListener('keydown', onKeyDown);
-    function onKeyDown(e) {
-      if (e.code === 'F6') {
-        searchFrame();
-      } else if (e.code === 'F7') {
-        searchFrameNext();
-      } else if (e.code === 'F8') {
-        searchFrameStop();
-      }
     }
   </script>
 </head>
@@ -53,12 +39,21 @@
 
   <div>
     <input type="text" id="search"></input>
-    <button onclick="searchFrame()">Start Search</button>
-    <button onclick="searchFrameNext()">Search Next</button>
-    <button onclick="searchFrameStop()">Stop Search</button>
+    <button onclick="searchFrame('outer-iframe', 'search')">Start Search</button>
+    <button onclick="searchFrameNext('outer-iframe', 'search')">Search Next</button>
+    <button onclick="searchFrameStop('outer-iframe', 'search')">Stop Search</button>
     <p>below is an iframe</p>
-    <iframe name="my-search-iframe" id="outer-iframe" src="iframe-contents.html"
-      style="display:block; border: 2px solid purple; background-color: white; width: 100%; height: 300px">
+    <iframe name="my-search-iframe" id="outer-iframe" src="inner-iframe-contents.html"
+        style="border: 2px solid purple; background-color: white; width: 100%;">
+    </iframe>
+
+    <input type="text" id="second-search"></input>
+    <button onclick="searchFrame('second-iframe', 'second-search')">Start Search</button>
+    <button onclick="searchFrameNext('second-iframe', 'second-search')">Search Next</button>
+    <button onclick="searchFrameStop('second-iframe', 'second-search')">Stop Search</button>
+    <p>below is another iframe</p>
+    <iframe name="my-second-search-iframe" id="second-iframe" src="inner-iframe-contents.html"
+        style="border: 2px solid forestgreen; background-color: white; width: 100%;">
     </iframe>
   </div>
 </body>

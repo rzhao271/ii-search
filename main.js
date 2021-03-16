@@ -29,31 +29,18 @@ async function createWindow() {
       const [searchText, frameName, firstSearch] = args;
       const frame = mainFrame.framesInSubtree.find(frame => frame.name === frameName);
       if (enableFrameSearch) {
-        const opts = { frame: frame, findNext: firstSearch };
-        webContents.findInPage(searchText, opts);
+        webContents.findInPage(searchText, { frame: frame, findNext: firstSearch });
       } else {
         webContents.findInPage(searchText, { findNext: firstSearch });
       }
     } else if (channel === 'search-stop') {
-      webContents.stopFindInPage('keepSelection');
-      // const [frameName] = args;
-      // const frame = mainFrame.frames.find(frame => frame.name === frameName);
-      // if (enableFrameSearch) {
-      //   webContents.on('found-in-page', (e) => {
-      //     const foundFrame = e.frame;
-      //     const [pid, rid] = [foundFrame.processId, foundFrame.routingId];
-      //     if (pid === frame.processId && rid === frame.routingId) {
-      //       webContents.stopFindInPage('keepSelection');
-      //     }
-      //   });
-      //   const opts = { frame: frame };
-      //   webContents.findInPage(searchText);
-      // } else {
-      //   // webContents.on('found-in-page', (e) => {
-      //   //     webContents.stopFindInPage('keepSelection');
-      //   // });
-      //   webContents.stopFindInPage('keepSelection');searchText, { findNext: firstSearch });
-      // }
+      const [frameName] = args;
+      const frame = mainFrame.frames.find(frame => frame.name === frameName);
+      if (enableFrameSearch) {
+        webContents.stopFindInPage('keepSelection', frame);
+      } else {
+        webContents.stopFindInPage('keepSelection');
+      }
     }
   });
 }

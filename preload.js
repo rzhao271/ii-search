@@ -6,7 +6,7 @@ contextBridge.exposeInMainWorld(
             ipcRenderer.send('search', searchText, iframeName, firstSearch);
         },
         searchFrameInternalStop: (iframeName) => {
-            ipcRenderer.send('search-stop');
+            ipcRenderer.send('search-stop', iframeName);
         }
     }
 );
