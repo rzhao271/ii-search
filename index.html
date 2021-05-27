@@ -6,11 +6,37 @@
   <meta charset="UTF-8">
   <title>Hello World!</title>
   <script>
+    function debounce(func, timeout = 300){
+      let timer;
+      return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+      };
+    }
+    function debounceSearchFrame(id, inputId) {
+      debounce(searchFrame, 500)(id, inputId);
+    }
+    let oldSearchText = '';
     function searchFrame(id, inputId) {
       const iframe = document.getElementById(id);
       const iframeName = iframe.name;
-      const searchText = document.getElementById(inputId).value;
-      window.api.searchFrameInternal(searchText, iframeName, true);
+      const inputBox = document.getElementById(inputId);
+      const searchText = inputBox.value;
+      // const searchStart = inputBox.selectionStart;
+      const searchEnd = inputBox.selectionEnd;
+      if (searchText && searchText !== oldSearchText) {
+        oldSearchText = searchText;
+        window.api.searchFrameInternal(searchText, iframeName, true);
+      } else if (!searchText) {
+        oldSearchText = searchText;
+        window.api.searchFrameInternalStop(iframeName);
+      }
+      setTimeout(() => {
+        document.getElementById('search-but').focus();
+        document.getElementById(inputId).select();
+        const pos = searchEnd;
+        document.getElementById(inputId).setSelectionRange(pos, pos, "forward");
+      }, 500);
     }
     function searchFrameNext(id, inputId) {
       const iframe = document.getElementById(id);
@@ -29,31 +55,23 @@
 <body>
   <h1>Hello World!</h1>
 
-  <!-- All of the Node.js APIs are available in this renderer process. -->
-  We are using Node.js
-  <script>document.write(process.versions.node)</script>,
-  Chromium
-  <script>document.write(process.versions.chrome)</script>,
-  and Electron
-  <script>document.write(process.versions.electron)</script>.
-
   <div>
-    <input type="text" id="search"></input>
-    <button onclick="searchFrame('outer-iframe', 'search')">Start Search</button>
+    <input type="text" id="search" oninput="debounceSearchFrame('outer-iframe', 'search')"></input>
+    <button id='search-but' onclick="searchFrame('outer-iframe', 'search')">Start Search</button>
     <button onclick="searchFrameNext('outer-iframe', 'search')">Search Next</button>
     <button onclick="searchFrameStop('outer-iframe', 'search')">Stop Search</button>
-    <p>below is an iframe</p>
+    <p>below is an iframe, and we're on match <span id="outer-iframe-report"></span></p>
     <iframe name="my-search-iframe" id="outer-iframe" src="inner-iframe-contents.html"
         style="border: 2px solid purple; background-color: white; width: 100%;">
     </iframe>
 
-    <input type="text" id="second-search"></input>
+    <input type="text" id="second-search" oninput="searchFrame('second-iframe', 'second-search')"></input>
     <button onclick="searchFrame('second-iframe', 'second-search')">Start Search</button>
     <button onclick="searchFrameNext('second-iframe', 'second-search')">Search Next</button>
     <button onclick="searchFrameStop('second-iframe', 'second-search')">Stop Search</button>
     <p>below is another iframe</p>
-    <iframe name="my-second-search-iframe" id="second-iframe" src="inner-iframe-contents.html"
-        style="border: 2px solid forestgreen; background-color: white; width: 100%;">
+    <iframe name="my-second-search-iframe" id="second-iframe" src="inner-webview-contents.html"
+        style="border: 2px solid rgb(145, 172, 145); background-color: white; width: 100%;">
     </iframe>
   </div>
 </body>

@@ -7,7 +7,7 @@
   "version": "1.0.0",
   "author": "raymondzhao",
   "scripts": {
-    "start": "C:/Users/raymondzhao/work/electron/src/out/Testing/electron.exe C:/Users/raymondzhao/work/electron-work/iframe-iframe-search"
+    "start": "C:/Users/raymondzhao/work/internal-electron/src/out/Testing/electron.exe C:/Users/raymondzhao/work/electron-work/iframe-iframe-search"
   },
   "dependencies": {},
   "devDependencies": {

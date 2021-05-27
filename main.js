@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow, BrowserView} = require('electron')
 const path = require('path');
 
 async function createWindow() {
@@ -14,11 +14,37 @@ async function createWindow() {
     }
   })
 
+  // const view = new BrowserView({
+  //   webPreferences: {
+  //     nodeIntegration: true,
+  //     contextIsolation: true,
+  //     preload: path.join(__dirname, 'preload.js')
+  //   }
+  // })
+  // mainWindow.setBrowserView(view)
+  // view.setBounds({ x: 0, y: 0, width: 300, height: 300 })
+
   // and load the index.html of the app.
   await mainWindow.loadFile('index.html')
+  // await view.webContents.loadFile('searchbox.html')
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
+
+  let registered = false;
+
+  // view.webContents.on('ipc-message', (event, channel, ...args) => {
+  //   const mainFrame = mainWindow.webContents.mainFrame;
+  //   if (channel === 'search') {
+  //     const [searchText, frameName, firstSearch] = args;
+  //     const frame = mainFrame.framesInSubtree.find(frame => frame.name === frameName);
+  //     frame.findInFrame(searchText, { findNext: firstSearch });
+  //   } else if (channel === 'search-stop') {
+  //     const [frameName] = args;
+  //     const frame = mainFrame.frames.find(frame => frame.name === frameName);
+  //     frame.stopFindInFrame('clearSelection');
+  //   }
+  // });
 
   mainWindow.webContents.on('ipc-message', (event, channel, ...args) => {
     const webContents = mainWindow.webContents;
@@ -28,8 +54,17 @@ async function createWindow() {
     if (channel === 'search') {
       const [searchText, frameName, firstSearch] = args;
       const frame = mainFrame.framesInSubtree.find(frame => frame.name === frameName);
+      if (!registered) {
+        frame.on('found-in-frame', (ev, res) => {
+          console.log("found-in-frame: " + res.activeMatchOrdinal + "/" + res.matches);
+        });
+        webContents.on('found-in-page', (ev, res) => {
+          console.log(res.activeMatchOrdinal);
+        });
+        registered = true;
+      }
       if (enableFrameSearch) {
-        webContents.findInPage(searchText, { frame: frame, findNext: firstSearch });
+        frame.findInFrame(searchText, { findNext: firstSearch });
       } else {
         webContents.findInPage(searchText, { findNext: firstSearch });
       }
@@ -37,9 +72,9 @@ async function createWindow() {
       const [frameName] = args;
       const frame = mainFrame.frames.find(frame => frame.name === frameName);
       if (enableFrameSearch) {
-        webContents.stopFindInPage('keepSelection', frame);
+        frame.stopFindInFrame('clearSelection');
       } else {
-        webContents.stopFindInPage('keepSelection');
+        webContents.stopFindInPage('clearSelection');
       }
     }
   });

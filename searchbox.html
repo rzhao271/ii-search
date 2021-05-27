@@ -1,0 +1,23 @@
+<html>
+<head>
+    <script>
+        function searchFrame(id, inputId) {
+          const iframeName = 'my-search-iframe';
+          const searchText = document.getElementById(inputId).value;
+          if (searchText) {
+            window.api.searchFrameInternal(searchText, iframeName, true);
+          } else {
+            window.api.searchFrameInternalStop(iframeName);
+          }
+        }
+        function searchFrameStop(id) {
+          const iframeName = 'my-search-iframe';
+          window.api.searchFrameInternalStop(iframeName);
+        }
+    </script>
+</head>
+<body>
+    PREVIEW HERE
+    <input type="text" id="search" oninput="searchFrame('outer-iframe', 'search')"></input>
+</body>
+</html>
